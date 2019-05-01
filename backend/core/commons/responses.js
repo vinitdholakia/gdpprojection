@@ -10,5 +10,9 @@ module.exports = {
     invalidrequest: {
         code: "INVREQUEST",
         message: "Invalid Request"
+    },
+    apierror: {
+        result: "APIERROR",
+        message: "Third Party Error"
     }
 }

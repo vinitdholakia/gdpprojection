@@ -1,4 +1,4 @@
 module.exports = {
-    port: 7552,
+    port: 4334,
     db: {},
 }

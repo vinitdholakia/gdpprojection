@@ -4,11 +4,23 @@ const utils = require("../commons/utils");
 const api = require("./../commons/api");
 let service = {
     getGraphData: (...args) => {
-        return new Promise(function (resolve, reject) {
+        return new Promise(async function (resolve, reject) {
             try {
                 let _session = args[0] || {}; // User Session for Logged in User
                 let query = args[1] || {}; // filter data
-                ressolve([]);
+                let options = {
+                    query: query || {},
+                    method: "GET",
+                    url: "http://api.worldbank.org/countries/USA/indicators/NY.GDP.MKTP.CD?per_page=5000&format=json"
+                };
+                let data = await api.call(options).catch(err => {
+                    return reject(err);
+                });
+                if (!!data) {
+                    return resolve(data);
+                } else {
+                    return reject(rs.apierror);
+                }
             } catch (e) {
                 reject(e);
             }
