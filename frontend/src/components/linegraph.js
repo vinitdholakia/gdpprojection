@@ -1,5 +1,4 @@
 import * as d3 from "d3";
-import data from './Data';
 import React, {
     Component
 } from 'react';
@@ -8,14 +7,29 @@ import API from '../lib/interceptor';
 let api = new API();
 export default class LineGraph extends Component {
     state = {
-        error: ""
+        error: "",
+        data: [],
     }
     componentDidMount = () => {
         api.call({
             url: "/api/graph",
             method: "GET"
         }).then((data) => {
-            console.log(JSON.stringify(data, null, 2))
+            let arr = ((data.data || [])[1] || []);
+            let result = [];
+            for (let i = 0; i < arr.length; i++) {
+                let coords = {
+                    x: parseInt(arr[i].date || "0"),
+                    y: parseInt(parseInt(arr[i].value || "0") / 10000000000)
+                };
+                if (!!coords.x && !!coords.y) {
+                    result.push(coords);
+                }
+            }
+            //console.log(result)
+            this.setState(() => {
+                return { data: result }
+            });
         }).catch((err) => {
             this.setState(() => {
                 return {
@@ -32,24 +46,19 @@ export default class LineGraph extends Component {
         var margin = { top: 50, right: 50, bottom: 50, left: 50 };
         var width = 900 - margin.left - margin.right;
         var height = 600 - margin.top - margin.bottom;
-
         var n = 21;
-
         var xScale = d3.scaleLinear()
-            .domain([0, n - 1])
+            .domain([1960, 2017])
             .range([0, width]);
-
         var yScale = d3.scaleLinear()
-            .domain([0, 1])
+            .domain([0, 2000])
             .range([height, 0]);
-
         var line = d3.line()
-            .x(function (d, i) { return xScale(i); })
+            .x(function (d, i) { return xScale(d.x); })
             .y(function (d) { return yScale(d.y); })
             .curve(d3.curveMonotoneX)
-
-        var dataset = d3.range(n).map(function (d) { return { "y": d3.randomUniform(1)() } })
-
+        // var dataset = d3.range(n).map(function (d) { return { "y": d3.randomUniform(1)(), "x": d3.randomUniform(1)() } })
+        // console.log(dataset);
         var svg = d3.select(el).append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
@@ -64,19 +73,19 @@ export default class LineGraph extends Component {
         svg.append("g")
             .attr("class", "y axis")
             .call(d3.axisLeft(yScale));
-
+        console.log("asc", this.state.data)
         svg.append("path")
-            .datum(dataset)
+            .datum(this.state.data || [])
             .attr("class", "line")
             .attr("d", line);
 
         svg.selectAll(".dot")
-            .data(dataset)
+            .data(this.state.data)
             .enter().append("circle")
             .attr("class", "dot")
-            .attr("cx", function (d, i) { return xScale(i) })
-            .attr("cy", function (d) { return yScale(d.y) })
-            .attr("r", 5);
+            .attr("cx", function (d, i) { return xScale(d.x) })
+            .attr("cy", function (d) {return yScale(d.y) })
+            .attr("r", 2);
         return el.toReact();
     }
     render() {
@@ -126,7 +135,7 @@ export default class LineGraph extends Component {
                         </div>}
                         <h5>GDP (current US$)</h5>
                         <p><small>World Bank national accounts data, and OECD National Accounts data files.</small></p>
-                        {this.drawChart2()}
+                        {(this.state.data || []).length && this.drawChart2()}
                     </div>
                 </div>
             </div>
