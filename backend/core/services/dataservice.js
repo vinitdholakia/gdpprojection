@@ -8,10 +8,11 @@ let service = {
             try {
                 let _session = args[0] || {}; // User Session for Logged in User
                 let query = args[1] || {}; // filter data
+                query.country = query.country || "USA"
                 let options = {
                     query: query || {},
                     method: "GET",
-                    url: "http://api.worldbank.org/countries/USA/indicators/NY.GDP.MKTP.CD?per_page=5000&format=json"
+                    url: "http://api.worldbank.org/countries/"+query.country+"/indicators/NY.GDP.MKTP.CD?per_page=5000&format=json"
                 };
                 let data = await api.call(options).catch(err => {
                     return reject(err);
