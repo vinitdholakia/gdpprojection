@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import data from './Data';
 import React, {
     Component
 } from 'react';
@@ -111,11 +112,13 @@ export default class LineGraph extends Component {
         var xScale = d3.scaleLinear()
             .domain([this.state.filter.year.from, this.state.filter.year.to])
             .range([0, width]);
+
         var yScale = d3.scaleLinear()
             .domain([0, maxValue])
             .range([height, 0]);
+
         var line = d3.line()
-            .x(function (d, i) { return xScale(d.x); })
+            .x(function (d, i) { return xScale(i); })
             .y(function (d) { return yScale(d.y); })
             .curve(d3.curveMonotoneX)
         var svg = d3.select(el).append("svg")
